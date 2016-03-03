@@ -1,9 +1,31 @@
 import uuid
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.utils.functional import cached_property
+
+
+class VerificationChoices(object):
+    PENDING = 0
+    VERIFIED = 1
+    REJECTED = 2
+
+    @classmethod
+    def choices(cls):
+        return [
+            (cls.PENDING, 'Pending'),
+            (cls.VERIFIED, 'Verified'),
+            (cls.REJECTED, 'Rejected'),
+        ]
+
+    @classmethod
+    def to_dict(cls):
+        return {
+            cls.PENDING, 'Pending',
+            cls.VERIFIED, 'Verified',
+            cls.REJECTED, 'Rejected',
+        }
 
 
 class Organization(models.Model):
@@ -52,6 +74,21 @@ class Recipient(models.Model):
     is_verified_by_student_leader.short_description = 'Verified by Student Leader'
     is_verified_by_faculty_incharge.short_description = 'Verified by faculty incharge'
 
+    def clean(self):
+        if self.pk is None:
+            if self.organization_object.max_recipients is None:
+                if self.organization_object.recipients.filter(
+                    student_leader_verification__verification_status=VerificationChoices.VERIFIED,
+                    faculty_verification__verification_status=VerificationChoices.VERIFIED,
+                ).count() >= self.organization_object.max_recipients:
+                    raise ValidationError('This position has already received enough recipients')
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            if self.organization_object.recipients.count() >= self.organization_object.max_recipients:
+                return False
+        return super().save(*args, **kwargs)
+
     def __str__(self):
         return "{} - {}".format(self.organization_object, self.user.username)
 
@@ -62,14 +99,18 @@ class Recipient(models.Model):
 class StudentLeaderVerification(models.Model):
     recipient = models.OneToOneField(Recipient, related_name='student_leader_verification')
     verification_key = models.UUIDField(default=uuid.uuid4)
-    is_verified = models.BooleanField(default=False)
+    verification_status = models.PositiveSmallIntegerField(choices=VerificationChoices.choices(),
+                                                           default=VerificationChoices.PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
     verified_at = models.DateTimeField(null=True)
+    citation = models.TextField(null=True, blank=True)
 
 
 class FacultyVerification(models.Model):
     recipient = models.OneToOneField(Recipient, related_name='faculty_verification')
     verification_key = models.UUIDField(default=uuid.uuid4)
-    is_verified = models.BooleanField(default=False)
+    verification_status = models.PositiveSmallIntegerField(choices=VerificationChoices.choices(),
+                                                           default=VerificationChoices.PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
     verified_at = models.DateTimeField(null=True)
+    citation = models.TextField(null=True, blank=True)
