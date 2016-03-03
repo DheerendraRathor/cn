@@ -19,6 +19,7 @@ class OrganizationObject(models.Model):
     name = models.CharField(max_length=64, help_text='Name of post')
     organization = models.ForeignKey(Organization, related_name='posts_and_rewards')
     is_post = models.BooleanField(default=False)
+    max_recipients = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __str__(self):
         return "{} - {}".format(self.organization.name, self.name)

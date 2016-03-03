@@ -11,6 +11,7 @@ class RecipientInline(admin.TabularInline):
 
 class OrganizationObjectAdmin(admin.ModelAdmin):
     inlines = [RecipientInline]
+    list_filter = ['organization', 'is_post']
 
 
 class OrganizationObjectInline(admin.TabularInline):
@@ -22,6 +23,7 @@ class OrganizationObjectInline(admin.TabularInline):
 
 class OrganizationAdmin(admin.ModelAdmin):
     inlines = [OrganizationObjectInline]
+    search_fields = ['name', 'student_leader_username', 'faculty_in_charge_username']
 
 
 class StudentLeaderVerificationInline(admin.TabularInline):
@@ -33,8 +35,8 @@ class FacultyVerificationInline(admin.TabularInline):
 
 
 class RecipientAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'is_verified_by_student_leader', 'is_verified_by_faculty_incharge']
-
+    list_display = ['user', 'is_verified_by_student_leader', 'is_verified_by_faculty_incharge']
+    list_filter = ['organization_object__organization']
     inlines = [StudentLeaderVerificationInline, FacultyVerificationInline]
 
 
