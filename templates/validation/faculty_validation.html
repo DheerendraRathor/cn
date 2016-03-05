@@ -1,0 +1,23 @@
+{% extends 'validation/student_validation.html' %}
+
+{% block faculty_block %}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Pre-verification By</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">
+                    {{ student_verifier.name }} ({{ student_verifier.ldap_username }})
+                </p>
+            </div>
+        </div>
+
+        {% if student_leader_verification.citation %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Citation</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static">
+                        {{ student_leader_verification.citation }}
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+{% endblock %}

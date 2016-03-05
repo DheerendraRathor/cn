@@ -16,6 +16,17 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
+from organization.views import ValidateStudentVerification, ValidateFacultyVerification
+
+from .views import IndexView
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^student_validation/(?P<recipient_id>\d+)/(?P<key>[0-9A-Za-z]+)/$',
+        ValidateStudentVerification.as_view(),
+        name='student_validation'),
+    url(r'^faculty_validation/(?P<recipient_id>\d+)/(?P<key>[0-9A-Za-z]+)/$',
+        ValidateFacultyVerification.as_view(),
+        name='faculty_validation'),
 ]

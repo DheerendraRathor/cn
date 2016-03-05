@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Organization, OrganizationObject, Recipient, StudentLeaderVerification, FacultyVerification
+from .models import (Organization, OrganizationObject, Recipient, StudentLeaderVerification, FacultyVerification,
+                     StudentLeader, FacultyInCharge)
 
 
 class RecipientInline(admin.TabularInline):
@@ -11,7 +12,7 @@ class RecipientInline(admin.TabularInline):
 
 class OrganizationObjectAdmin(admin.ModelAdmin):
     inlines = [RecipientInline]
-    list_filter = ['organization', 'is_post']
+    list_filter = ['organization', 'object_type']
 
 
 class OrganizationObjectInline(admin.TabularInline):
@@ -26,20 +27,24 @@ class OrganizationAdmin(admin.ModelAdmin):
     search_fields = ['name', 'student_leader_username', 'faculty_in_charge_username']
 
 
-class StudentLeaderVerificationInline(admin.TabularInline):
-    model = StudentLeaderVerification
+class StudentLeaderVerificationAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'verification_status']
+    list_filter = ['verification_status']
 
 
-class FacultyVerificationInline(admin.TabularInline):
-    model = FacultyVerification
+class FacultyVerificationAdmin(admin.ModelAdmin):
+    pass
 
 
 class RecipientAdmin(admin.ModelAdmin):
-    list_display = ['user', 'is_verified_by_student_leader', 'is_verified_by_faculty_incharge']
+    list_display = ['user', 'organization_object', 'is_verified_by_student_leader', 'is_verified_by_faculty_incharge']
     list_filter = ['organization_object__organization']
-    inlines = [StudentLeaderVerificationInline, FacultyVerificationInline]
 
 
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationObject, OrganizationObjectAdmin)
 admin.site.register(Recipient, RecipientAdmin)
+admin.site.register(StudentLeaderVerification, StudentLeaderVerificationAdmin)
+admin.site.register(FacultyVerification, FacultyVerificationAdmin)
+admin.site.register(StudentLeader)
+admin.site.register(FacultyInCharge)

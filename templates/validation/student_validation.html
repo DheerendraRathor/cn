@@ -1,0 +1,110 @@
+{% extends 'root.html' %}
+{% load staticfiles %}
+
+{% block body %}
+
+    <h3 class="text-capitalize text-center">Verification Request</h3>
+
+    <form class="form-horizontal" method="POST">
+        {% csrf_token %}
+        <ul class="form-error">
+            {% for error in verification_form.non_field_errors %}
+                <li><strong>{{ error }}</strong></li>
+            {% endfor %}
+        </ul>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Organization</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">{{ organization }}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Object</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">
+                    {{ organization_object.name }} ({{ organization_object.get_object_type_display }})
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="recipient" class="col-sm-2 control-label">Recipient</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">
+                    {{ recipient.user.get_full_name|default:recipient.user.username }}
+                </p>
+            </div>
+        </div>
+
+        {% block faculty_block %}{% endblock %}
+
+        <div class="form-group">
+            <label for="id_verification_status" class="col-sm-2 control-label">Choose Status</label>
+            <div class="col-sm-3">
+                {{ verification_form.verification_status }}
+                <ul class="form-error">
+                    {% for error in verification_form.verification_status.errors %}
+                        <li><strong>{{ error }}</strong></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div id="citation_form_div" class="form-group hide">
+            <label for="id_citation" class="col-sm-2 control-label">Citation</label>
+            <div class="col-sm-10">
+                {{ verification_form.citation }}
+                <span class="help-block">Citation will be visible on public certificate</span>
+                <ul class="form-error">
+                    {% for error in verification_form.citation.errors %}
+                        <li><strong>{{ error }}</strong></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div id="rejection_reason_form_div" class="form-group hide">
+            <label for="id_rejection_reason" class="col-sm-2 control-label">Rejection Reason</label>
+            <div class="col-sm-10">
+                {{ verification_form.rejection_reason }}
+                <span class="help-block">Enter rejection reason only if request is rejected</span>
+                <ul class="form-error">
+                    {% for error in verification_form.rejection_reason.errors %}
+                        <li><strong>{{ error }}</strong></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="signature"> I,
+                        <b>{{ verifier.name }}</b>
+                        as <b>{{ verifier.designation }}</b>
+                        hereby confirm that all information is correct as per best of my knowledge
+                    </label>
+                </div>
+                <ul class="form-error">
+                    {% for error in verification_form.signature.errors %}
+                        <li><strong>{{ error }}</strong></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block jsLinks %}
+    <script type="text/javascript">
+        var citation_value = "{{ verification_choices.VERIFIED }}";
+        var rejection_reason_value = "{{ verification_choices.REJECTED }}";
+    </script>
+
+    <script type="text/javascript" src="{% static 'js/validation/validation.js' %}"></script>
+{% endblock %}
