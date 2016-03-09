@@ -95,6 +95,7 @@ class OrganizationObject(models.Model):
         unique_together = ('name', 'organization')
 
 
+# TODO: Add self appraisal thing
 class Recipient(models.Model):
     user = models.ForeignKey(User)
     organization_object = models.ForeignKey(OrganizationObject, related_name='recipients')
