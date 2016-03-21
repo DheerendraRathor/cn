@@ -13,20 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 
 from organization.views import ValidateStudentVerification, ValidateFacultyVerification
 
 from .views import IndexView
+import organization.urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', IndexView.as_view(), name='index'),
-    url(r'^student_validation/(?P<recipient_id>\d+)/(?P<key>[0-9A-Za-z]+)/$',
+    url(r'^student_validation/(?P<recipient_id>\d+)/$',
         ValidateStudentVerification.as_view(),
         name='student_validation'),
-    url(r'^faculty_validation/(?P<recipient_id>\d+)/(?P<key>[0-9A-Za-z]+)/$',
+    url(r'^faculty_validation/(?P<recipient_id>\d+)/$',
         ValidateFacultyVerification.as_view(),
         name='faculty_validation'),
+    url(r'^profile/', include(organization.urls, namespace='profile')),
 ]

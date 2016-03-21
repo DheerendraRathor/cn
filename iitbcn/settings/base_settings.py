@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'nested_inline',
     'organization',
+    'utils',
+    'rest_framework',
 ]
 
 MIDDLEWARE_CLASSES = [

@@ -1,0 +1,91 @@
+{% extends 'logged_in.html' %}
+
+{% block body %}
+
+    <h3>Add New Post/Award request</h3>
+
+    <form class="form-horizontal" role="form" method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="organization" class="col-sm-2 control-label">Organization</label>
+            <div class="col-sm-5">
+                <select id="organization" class="form-control" name="organization">
+                    <option>--------</option>
+                    {% for organization in organizations %}
+                        <option value="{{ organization.id }}"
+                                {% if organization_asked == organization.id %}
+                                selected
+                                {% endif %}
+                        >{{ organization.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+    {% if objects %}
+
+        <div class="form-group">
+            <label for="object" class="col-sm-2 control-label">Object</label>
+            <div class="col-sm-5">
+                <select id="object" class="form-control" name="object">
+                    {% for object in objects %}
+                        <option value="{{ object.id }}">{{ object.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="self-appraisal" class="col-sm-2 control-label">Self Appraisal</label>
+            <div class="col-sm-8">
+                <textarea rows="5" id="self-appraisal" name="self-appraisal" class="form-control"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="submit" class="col-sm-2 control-label sr-only">Submit</label>
+            <div class="col-sm-2">
+                <input type="submit" class="btn btn-primary">
+            </div>
+        </div>
+
+    {% else %}
+
+        <h4 class="text-warning">No post or award available. Choose some other organization</h4>
+
+    {% endif %}
+
+    </form>
+
+{% endblock %}
+
+{% block jsLinks %}
+    <script type="text/javascript">
+
+        function updateQueryStringParameter(uri, key, value) {
+            var re = new RegExp("([?|&])" + key + "=.*?(&|#|$)", "i");
+            if (uri.match(re)) {
+                return uri.replace(re, '$1' + key + "=" + value + '$2');
+            } else {
+                var hash =  '';
+                if( uri.indexOf('#') !== -1 ){
+                    hash = uri.replace(/.*#/, '#');
+                    uri = uri.replace(/#.*/, '');
+                }
+                var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+                return uri + separator + key + "=" + value + hash;
+            }
+        }
+
+
+        (function($) {
+            $(document).ready( function() {
+                $('#organization').change(function() {
+                    window.location.href = updateQueryStringParameter(window.location.href, 'org', $(this).val());
+                });
+            });
+        })(jQuery);
+    </script>
+
+{% endblock %}

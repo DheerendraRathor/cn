@@ -37,7 +37,8 @@ class FacultyVerificationAdmin(admin.ModelAdmin):
 
 
 class RecipientAdmin(admin.ModelAdmin):
-    list_display = ['user', 'organization_object', 'is_verified_by_student_leader', 'is_verified_by_faculty_incharge']
+    list_display = ['user', 'organization_object', 'student_leader_verification_status',
+                    'faculty_incharge_verification_status']
     list_filter = ['organization_object__organization']
 
 

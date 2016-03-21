@@ -14,7 +14,7 @@ class ValidateStudentVerification(TemplateView):
 
     template_name = 'validation/student_validation.html'
 
-    def get_verification_object(self, recipient_id: int, verification_key: str) -> StudentLeaderVerification:
+    def get_verification_object(self, recipient_id: int) -> StudentLeaderVerification:
         verification_obj = get_object_or_404(  # type: StudentLeaderVerification
             StudentLeaderVerification.objects.select_related(
                 'recipient__user',
@@ -22,18 +22,16 @@ class ValidateStudentVerification(TemplateView):
                 'verifier'
             ).filter(verification_status=VerificationChoices.PENDING),
             recipient_id=recipient_id,
-            verification_key=verification_key
         )
         return verification_obj
 
-    def validate_request(self, request, *args, **kwargs) -> Tuple[int, str]:
+    def validate_request(self, request, *args, **kwargs) -> int:
         recipient_id = kwargs.pop('recipient_id', None)  # type: str
-        verification_key = kwargs.pop('key', None)  # type: str
 
-        if (not recipient_id or not recipient_id.isdigit()) or not verification_key:
+        if not recipient_id or not recipient_id.isdigit():
             raise Http404
 
-        return int(recipient_id), verification_key
+        return int(recipient_id)
 
     def update_context(self, verification_obj: StudentLeaderVerification, kwargs: dict) -> dict:
         kwargs['organization'] = verification_obj.recipient.organization_object.organization
@@ -45,9 +43,9 @@ class ValidateStudentVerification(TemplateView):
         return kwargs
 
     def get(self, request, *args, **kwargs):
-        recipient_id, verification_key = self.validate_request(request, *args, **kwargs)
+        recipient_id = self.validate_request(request, *args, **kwargs)
 
-        verification_obj = self.get_verification_object(recipient_id, verification_key)
+        verification_obj = self.get_verification_object(recipient_id)
 
         kwargs = self.update_context(verification_obj, kwargs)
 
@@ -66,9 +64,9 @@ class ValidateStudentVerification(TemplateView):
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        recipient_id, verification_key = self.validate_request(request, *args, **kwargs)
+        recipient_id = self.validate_request(request, *args, **kwargs)
 
-        verification_obj = self.get_verification_object(recipient_id, verification_key)
+        verification_obj = self.get_verification_object(recipient_id)
 
         verification_form = VerificationForm(data=request.POST)
         if verification_form.is_valid():
@@ -91,7 +89,7 @@ class ValidateFacultyVerification(ValidateStudentVerification):
 
     template_name = 'validation/faculty_validation.html'
 
-    def get_verification_object(self, recipient_id: int, verification_key: str) -> FacultyVerification:
+    def get_verification_object(self, recipient_id: int) -> FacultyVerification:
         verification_obj = get_object_or_404(  # type: FacultyVerification
             FacultyVerification.objects.select_related(
                 'recipient__user',
@@ -103,7 +101,6 @@ class ValidateFacultyVerification(ValidateStudentVerification):
                 recipient__student_leader_verification__verification_status=VerificationChoices.VERIFIED,
             ),
             recipient_id=recipient_id,
-            verification_key=verification_key
         )
         return verification_obj
 

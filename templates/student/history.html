@@ -1,0 +1,38 @@
+{% extends 'logged_in.html' %}
+
+{% block body %}
+
+        <table class="table table-striped">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Organization</th>
+                    <th>Object</th>
+                    <th>Requested On</th>
+                    <th>Verified by student</th>
+                    <th>Verified by faculty</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for recipient in recipients %}
+
+                    <tr>
+                        <th>{{ forloop.counter }}</th>
+                        <td>{{ recipient.organization_object.organization }}</td>
+                        <td>{{ recipient.organization_object.name }}</td>
+                        <td>{{ recipient.requested_at }}</td>
+                        <td>{{ recipient.render_student_leader_verification|safe }}</td>
+                        <td>{{ recipient.render_faculty_verification|safe }}</td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+{% endblock %}
