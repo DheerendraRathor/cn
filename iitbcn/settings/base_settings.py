@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'organization',
     'utils',
     'rest_framework',
+    'accounts',
 ]
 
 MIDDLEWARE_CLASSES = [
